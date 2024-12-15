@@ -1,7 +1,7 @@
 use anyhow::Result;
 use common::get_input;
 
-fn day_one() -> Result<i32> {
+fn day_1() -> Result<i32> {
     let input = get_input(1)?;
 
     let (mut left, mut right): (Vec<i32>, Vec<i32>) = input
@@ -26,7 +26,7 @@ fn day_one() -> Result<i32> {
 }
 
 fn main() -> Result<()> {
-    day_one().map(|_| ())
+    day_1().map(|_| ())
 }
 
 #[cfg(test)]
@@ -35,7 +35,7 @@ mod tests {
 
     #[test]
     fn test_day_one() {
-        let total = day_one().unwrap();
+        let total = day_1().unwrap();
         assert_eq!(total, 1579939);
     }
 }
