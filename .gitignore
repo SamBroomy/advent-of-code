@@ -1,0 +1,14 @@
+# Ignore all files
+*
+# Allow directories
+!*/
+# Allow .gitignore itself
+!.gitignore
+# Allow rust files
+!**/*.rs
+# Allow Cargo.toml
+!**/Cargo.toml
+# Allow Cargo.lock
+!**/Cargo.lock
+# Ignore target directory
+**/target/
