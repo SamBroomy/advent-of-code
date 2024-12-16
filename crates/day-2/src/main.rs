@@ -133,6 +133,20 @@ mod tests {
     }
 
     #[test]
+    fn test_part_1() {
+        let input = "1 2 3 4\n4 3 2 1\n1 2 1 4\n1 2 3 7";
+        let total = part_1(input);
+        assert_eq!(total, 2);
+    }
+
+    #[test]
+    fn test_part_2() {
+        let input = "1 2 3 4\n4 3 2 1\n1 2 1 4\n1 2 3 7\n1 7 8 10\n1 235, 3, 5\n1 235 3 5 2345 8";
+        let total = part_2(input);
+        assert_eq!(total, 6);
+    }
+
+    #[test]
     fn test_day_2_part_1() {
         let input = get_input(2).unwrap();
         let total = part_1(&input);
