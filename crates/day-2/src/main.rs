@@ -2,34 +2,20 @@ use anyhow::Result;
 use common::get_input;
 use itertools::Itertools;
 
+fn is_valid_line(line: &str) -> bool {
+    line.split_whitespace()
+        .filter_map(|x| x.parse::<i32>().ok())
+        .tuple_windows()
+        .all(|(a, b, c)| {
+            let x = a - b;
+            let y = b - c;
+            (x.abs() <= 3 && y.abs() <= 3) && ((x > 0) && (y > 0) || (x < 0) && (y < 0))
+        })
+}
 fn day_2() -> Result<i32> {
     let input = get_input(2)?;
 
-    let count = input
-        .lines()
-        .map(|line| {
-            line.split_whitespace()
-                .filter_map(|x| x.parse::<i32>().ok())
-                .tuple_windows::<(_, _, _)>()
-                .map(|(a, b, c)| {
-                    // The levels are either all increasing or all decreasing.
-                    // Any two adjacent levels differ by at least one and at most three.
-                    let x = a - b;
-                    let y = b - c;
-
-                    if (x.abs() > 3) || (y.abs() > 3) {
-                        return false;
-                    }
-
-                    if ((x > 0) && (y > 0)) || ((x < 0) && (y < 0)) {
-                        return true;
-                    }
-                    false
-                })
-                .all(|x| x)
-        })
-        .filter(|x| *x)
-        .count();
+    let count = input.lines().filter(|line| is_valid_line(line)).count();
 
     println!("{}", count);
 
