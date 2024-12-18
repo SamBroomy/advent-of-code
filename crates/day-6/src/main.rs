@@ -3,6 +3,8 @@ use std::char;
 use anyhow::Result;
 use common::get_input;
 use std::collections::HashSet;
+use std::sync::mpsc;
+use std::thread;
 
 enum Finish {
     Visited,
@@ -132,7 +134,7 @@ fn part_2(input: &str) -> i32 {
 
     let patrol_path = guard.visited.iter().map(|(p, _)| p).collect::<HashSet<_>>();
 
-    let mut total_loops = 0;
+    let (tx, rx) = mpsc::channel();
 
     for (i, j) in patrol_path {
         let mut new_grid = grid.clone();
@@ -143,16 +145,20 @@ fn part_2(input: &str) -> i32 {
         }
         let mut new_guard = Guard::new(start, Direction::Up);
 
-        match new_guard.patrol(&new_grid) {
-            Finish::Visited => {
-                total_loops += 1;
+        let tx = tx.clone();
+
+        thread::spawn(move || {
+            if matches!(new_guard.patrol(&new_grid), Finish::Visited) {
+                tx.send(1).unwrap();
             }
-            Finish::OutOfBounds => {
-                continue;
-            }
-        }
+        });
     }
-    total_loops
+    drop(tx);
+    let mut total_loops_found = 0;
+    while rx.recv().is_ok() {
+        total_loops_found += 1;
+    }
+    total_loops_found
 }
 
 fn main() -> Result<()> {
