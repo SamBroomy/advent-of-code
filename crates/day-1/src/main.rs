@@ -57,10 +57,34 @@ mod tests {
     }
 
     #[test]
+    fn test_part_1_example() {
+        let input = "3   4
+        4   3
+        2   5
+        1   3
+        3   9
+        3   3";
+        let total = part_1(input);
+        assert_eq!(total, 11);
+    }
+
+    #[test]
     fn test_day_1_part_1() {
         let input = get_input(1).unwrap();
         let total = part_1(&input);
         assert_eq!(total, 1579939);
+    }
+    
+    #[test]
+    fn test_part_2_example() {
+        let input = "3   4
+        4   3
+        2   5
+        1   3
+        3   9
+        3   3";
+        let total = part_2(input);
+        assert_eq!(total, 31);
     }
 
     #[test]

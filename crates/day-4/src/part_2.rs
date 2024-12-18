@@ -55,12 +55,7 @@ pub fn part_2(input: &str) -> i32 {
                     _ => break,
                 }
             }
-            if !words.is_empty()
-                && words.iter().all(|w| match w {
-                    ['M', 'S'] | ['S', 'M'] => true,
-                    _ => false,
-                })
-            {
+            if !words.is_empty() && words.iter().all(|w| matches!(w, ['M', 'S'] | ['S', 'M'])) {
                 total += 1;
             }
         }

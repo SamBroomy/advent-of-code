@@ -3,33 +3,33 @@ use std::char;
 use crate::common::{match_next, to_grid, Direction, Position, Word};
 
 #[derive(Debug, Clone, Copy)]
-enum XMAS {
+enum Xmas {
     X,
     M,
     A,
     S,
 }
 
-impl Word for XMAS {
+impl Word for Xmas {
     fn new() -> Self {
-        XMAS::X
+        Xmas::X
     }
 
     fn match_char(&self, c: &char) -> bool {
         match self {
-            XMAS::X => *c == 'X',
-            XMAS::M => *c == 'M',
-            XMAS::A => *c == 'A',
-            XMAS::S => *c == 'S',
+            Xmas::X => *c == 'X',
+            Xmas::M => *c == 'M',
+            Xmas::A => *c == 'A',
+            Xmas::S => *c == 'S',
         }
     }
 
     fn get_next(self) -> Option<Self> {
         match self {
-            XMAS::X => Some(XMAS::M),
-            XMAS::M => Some(XMAS::A),
-            XMAS::A => Some(XMAS::S),
-            XMAS::S => None,
+            Xmas::X => Some(Xmas::M),
+            Xmas::M => Some(Xmas::A),
+            Xmas::A => Some(Xmas::S),
+            Xmas::S => None,
         }
     }
 }
@@ -81,7 +81,7 @@ pub fn part_1(input: &str) -> i32 {
 
     for i in 0..lines_grid.len() {
         for j in 0..lines_grid[i].len() {
-            let word = XMAS::new();
+            let word = Xmas::new();
             if !word.match_char(&lines_grid[i][j]) {
                 continue;
             }

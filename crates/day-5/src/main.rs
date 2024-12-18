@@ -33,11 +33,11 @@ fn sorted(x: &i32, y: &i32, rules: &HashSet<(i32, i32)>) -> bool {
 
 fn compare(x: &i32, y: &i32, rules: &HashSet<(i32, i32)>) -> std::cmp::Ordering {
     if rules.contains(&(*x, *y)) {
-        return std::cmp::Ordering::Less;
+        std::cmp::Ordering::Less
     } else if rules.contains(&(*y, *x)) {
-        return std::cmp::Ordering::Greater;
+        std::cmp::Ordering::Greater
     } else {
-        return std::cmp::Ordering::Equal;
+        std::cmp::Ordering::Equal
     }
 }
 
@@ -85,10 +85,79 @@ mod tests {
     use super::*;
 
     #[test]
+    fn part_1_example() {
+        let input = "47|53
+        97|13
+        97|61
+        97|47
+        75|29
+        61|13
+        75|53
+        29|13
+        97|29
+        53|29
+        61|53
+        97|53
+        61|29
+        47|13
+        75|47
+        97|75
+        47|61
+        75|61
+        47|29
+        75|13
+        53|13
+
+        75,47,61,53,29
+        97,61,53,29,13
+        75,29,13
+        75,97,47,61,53
+        61,13,29
+        97,13,75,29,47";
+
+        let total = part_1(input);
+        assert_eq!(total, 143)
+    }
+
+    #[test]
     fn day_5_part_1() {
         let input = get_input(5).unwrap();
         let total = part_1(&input);
         assert_eq!(total, 7024);
+    }
+
+    #[test]
+    fn part_2_input() {
+        let input = "47|53
+        97|13
+        97|61
+        97|47
+        75|29
+        61|13
+        75|53
+        29|13
+        97|29
+        53|29
+        61|53
+        97|53
+        61|29
+        47|13
+        75|47
+        97|75
+        47|61
+        75|61
+        47|29
+        75|13
+        53|13
+
+        75,47,61,53,29
+        97,61,53,29,13
+        75,29,13
+        75,97,47,61,53
+        61,13,29
+        97,13,75,29,47";
+        let total = part_2(input);
+        assert_eq!(total, 123);
     }
 
     #[test]
