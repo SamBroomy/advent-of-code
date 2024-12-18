@@ -20,7 +20,7 @@ fn part_1(input: &str) -> i32 {
     right.sort();
 
     left.into_iter()
-        .zip(right.into_iter())
+        .zip(right)
         .fold(0, |acc, (l, r)| acc + (l - r).abs())
 }
 
@@ -29,7 +29,7 @@ fn part_2(input: &str) -> i32 {
 
     left.iter()
         .map(|l| l * right.iter().filter(|r| l == *r).count() as i32)
-        .fold(0, |acc, x| acc + x)
+        .sum()
 }
 
 fn main() -> Result<()> {
@@ -74,7 +74,7 @@ mod tests {
         let total = part_1(&input);
         assert_eq!(total, 1579939);
     }
-    
+
     #[test]
     fn test_part_2_example() {
         let input = "3   4
