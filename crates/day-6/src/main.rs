@@ -4,6 +4,12 @@ use anyhow::Result;
 use common::get_input;
 use std::collections::HashSet;
 
+enum Finish {
+    Visited,
+    OutOfBounds,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum Direction {
     Up,
     Down,
@@ -44,7 +50,7 @@ impl Direction {
 struct Guard {
     pos: (usize, usize),
     dir: Direction,
-    visited: HashSet<(usize, usize)>,
+    visited: HashSet<((usize, usize), Direction)>,
 }
 
 impl Guard {
@@ -56,35 +62,47 @@ impl Guard {
         }
     }
 
-    fn move_guard(&mut self, grid: &Vec<Vec<char>>) -> Option<()> {
+    fn new_visited(&mut self) -> bool {
+        self.visited.insert((self.pos, self.dir))
+    }
+
+    fn patrol(&mut self, grid: &Vec<Vec<char>>) -> Finish {
         let (i, j) = self.pos;
-
-        self.visited.insert((i, j));
-
+        if !self.new_visited() {
+            return Finish::Visited;
+        }
+        self.visited.insert((self.pos, self.dir));
+        // check if we've visited this position before, if so infinite loop
+        // get next position
         let (Some(next_i), Some(next_j)) = self.dir.get_next_pos((i, j)) else {
-            return None;
+            return Finish::OutOfBounds;
         };
-        // get next char
-        let char = grid.get(next_i).and_then(|v| v.get(next_j))?;
+
+        let Some(char) = grid.get(next_i).and_then(|v| v.get(next_j)) else {
+            return Finish::OutOfBounds;
+        };
         // check if it's a wall
         if *char == '#' {
             self.dir = self.dir.next();
         } else {
             self.pos = (next_i, next_j);
         }
-        return self.move_guard(grid);
+        self.patrol(grid)
     }
 
-    fn patrol(&mut self, grid: &Vec<Vec<char>>) -> i32 {
-        self.move_guard(grid);
-        self.visited.len() as i32
+    fn total_visited(&self) -> i32 {
+        self.visited
+            .iter()
+            .map(|(p, _)| p)
+            .collect::<HashSet<_>>()
+            .len() as i32
     }
 }
 
-fn find_start(grid: &Vec<Vec<char>>) -> Option<Guard> {
-    for i in 0..grid.len() {
-        for j in 0..grid[i].len() {
-            if let Some(d) = Direction::from_char(grid[i][j]) {
+fn find_start(grid: &[Vec<char>]) -> Option<Guard> {
+    for (i, v) in grid.iter().enumerate() {
+        for (j, c) in v.iter().enumerate() {
+            if let Some(d) = Direction::from_char(*c) {
                 return Some(Guard::new((i, j), d));
             }
         }
@@ -99,7 +117,42 @@ fn part_1(input: &str) -> i32 {
         .collect::<Vec<Vec<char>>>();
     let mut guard = find_start(&grid).unwrap();
 
-    guard.patrol(&grid)
+    guard.patrol(&grid);
+    guard.total_visited()
+}
+
+fn part_2(input: &str) -> i32 {
+    let grid = input
+        .lines()
+        .map(|line| line.chars().collect())
+        .collect::<Vec<Vec<char>>>();
+    let mut guard = find_start(&grid).unwrap();
+    let start = guard.pos;
+    guard.patrol(&grid);
+
+    let patrol_path = guard.visited.iter().map(|(p, _)| p).collect::<HashSet<_>>();
+
+    let mut total_loops = 0;
+
+    for (i, j) in patrol_path {
+        let mut new_grid = grid.clone();
+        if new_grid[*i][*j] == '^' {
+            continue;
+        } else {
+            new_grid[*i][*j] = '#';
+        }
+        let mut new_guard = Guard::new(start, Direction::Up);
+
+        match new_guard.patrol(&new_grid) {
+            Finish::Visited => {
+                total_loops += 1;
+            }
+            Finish::OutOfBounds => {
+                continue;
+            }
+        }
+    }
+    total_loops
 }
 
 fn main() -> Result<()> {
@@ -107,8 +160,12 @@ fn main() -> Result<()> {
     let p1 = part_1(&input);
     println!("Part1: {}", p1);
 
-    // let p2 = part_2(&input);
-    // println!("Part2: {}", p2);
+    // Time how long it takes to run part 2
+
+    let start = std::time::Instant::now();
+    let p2 = part_2(&input);
+    let duration = start.elapsed();
+    println!("Part2: {} [{}]", p2, duration.as_secs_f32());
 
     Ok(())
 }
@@ -138,5 +195,28 @@ mod tests {
         let input = get_input(6).unwrap();
         let total = part_1(&input);
         assert_eq!(total, 5145);
+    }
+
+    #[test]
+    fn part_2_example() {
+        let input = "....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...";
+        let total = part_2(input);
+        assert_eq!(total, 6);
+    }
+
+    #[test]
+    fn test_part_2() {
+        let input = get_input(6).unwrap();
+        let total = part_2(&input);
+        assert_eq!(total, 1523);
     }
 }
