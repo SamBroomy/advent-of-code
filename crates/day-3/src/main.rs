@@ -51,9 +51,9 @@ mod tests {
 
     #[test]
     fn test_part_1() {
-        let input = "mul(1,2)malformedmul[3,2]mul(3,4)";
+        let input = "mul(3,2)malformedmul[3,2]mul(3,4)";
         let total = part_1(input);
-        assert_eq!(total, (1 * 2) + (3 * 4));
+        assert_eq!(total, (3 * 2) + (3 * 4));
     }
 
     #[test]
