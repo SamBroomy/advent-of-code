@@ -163,15 +163,14 @@ fn part_2(input: &str) -> i32 {
 
 fn main() -> Result<()> {
     let input = get_input(6)?;
+    let start = std::time::Instant::now();
     let p1 = part_1(&input);
-    println!("Part1: {}", p1);
-
-    // Time how long it takes to run part 2
+    println!("Part1: {} (took {:?})", p1, start.elapsed());
 
     let start = std::time::Instant::now();
     let p2 = part_2(&input);
-    let duration = start.elapsed();
-    println!("Part2: {} [{}]", p2, duration.as_secs_f32());
+
+    println!("Part2: {} (took {:?})", p2, start.elapsed());
 
     Ok(())
 }
