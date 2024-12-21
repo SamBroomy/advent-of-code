@@ -1,0 +1,9 @@
+[package]
+name = "day-10"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tree-ds = { version = "0.1.6", features = ["print_node_id"] }
+common = { path = "../common" }
+anyhow = "1.0.94"
