@@ -59,11 +59,11 @@ impl Equation {
         }
     }
 
-    fn new_part_2<T: Into<i64>>(a: T, b: T, c: T) -> Self {
+    fn into_part_2(self) -> Self {
         Equation {
-            a: a.into(),
-            b: b.into(),
-            c: c.into() + 10000000000000,
+            a: self.a,
+            b: self.b,
+            c: self.c + 10000000000000,
         }
     }
 
@@ -97,6 +97,17 @@ struct SimultaneousEquation {
 }
 
 impl SimultaneousEquation {
+    fn new(e1: Equation, e2: Equation) -> Self {
+        SimultaneousEquation { e1, e2 }
+    }
+
+    fn into_part_2(&self) -> Self {
+        SimultaneousEquation {
+            e1: self.e1.into_part_2(),
+            e2: self.e2.into_part_2(),
+        }
+    }
+
     fn parse_input(input: &str) -> Vec<Self> {
         input.split("\n\n").map(Self::from_lines).collect()
     }
@@ -149,7 +160,12 @@ fn part_1(input: &str) -> i64 {
 }
 
 fn part_2(input: &str) -> i64 {
-    todo!()
+    let equations = SimultaneousEquation::parse_input(input);
+    equations
+        .iter()
+        .map(SimultaneousEquation::into_part_2)
+        .filter_map(|sim: SimultaneousEquation| sim.cost())
+        .sum::<i64>()
 }
 fn main() -> Result<()> {
     let input = get_input(13)?;
@@ -200,13 +216,13 @@ Prize: X=18641, Y=10279";
     #[test]
     fn part_2_example() {
         let total = part_2(EXAMPLE_INPUT);
-        assert_eq!(total, 0);
+        assert_eq!(total, 875318608908);
     }
 
     #[test]
     fn test_part_2() {
-        let input = get_input(12).unwrap();
+        let input = get_input(13).unwrap();
         let total = part_2(&input);
-        assert_eq!(total, 0);
+        assert_eq!(total, 95273925552482);
     }
 }
