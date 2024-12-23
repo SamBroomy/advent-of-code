@@ -97,11 +97,7 @@ struct SimultaneousEquation {
 }
 
 impl SimultaneousEquation {
-    fn new(e1: Equation, e2: Equation) -> Self {
-        SimultaneousEquation { e1, e2 }
-    }
-
-    fn into_part_2(&self) -> Self {
+    fn into_part_2(self) -> Self {
         SimultaneousEquation {
             e1: self.e1.into_part_2(),
             e2: self.e2.into_part_2(),
@@ -162,7 +158,7 @@ fn part_1(input: &str) -> i64 {
 fn part_2(input: &str) -> i64 {
     let equations = SimultaneousEquation::parse_input(input);
     equations
-        .iter()
+        .into_iter()
         .map(SimultaneousEquation::into_part_2)
         .filter_map(|sim: SimultaneousEquation| sim.cost())
         .sum::<i64>()
