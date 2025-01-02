@@ -1,0 +1,20 @@
+[package]
+name = "advent-benches"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+criterion = "0.5"
+paste = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+glob = "0.3.1"
+serde_json = "1.0.134"
+anyhow.workspace = true
+scan_fmt = "0.2.6"
+regex.workspace = true
+
+aoc_2024 = { path = "../aoc_2024" }
+
+[[bench]]
+name = "bench"
+harness = false
