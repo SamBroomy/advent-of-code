@@ -8,7 +8,10 @@
 !**/*.rs
 # Allow Cargo.toml
 !**/Cargo.toml
-# Allow Cargo.lock
 !**/Cargo.lock
 # Ignore target directory
-**/target/
+target/
+# Allow Justfile
+!justfile
+!**/*input.txt
+!rust.tmpl
