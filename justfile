@@ -11,6 +11,9 @@ new DAY:
 next:
     @cargo run --bin aoc_utils next --year {{AOC_YEAR}}
 
+refresh:
+    cargo run --bin aoc_utils refresh --year {{AOC_YEAR}}
+
 # Run benchmarks for the year or a specific day
 bench DAY="":
     #!/usr/bin/env sh
@@ -21,7 +24,7 @@ bench DAY="":
         cargo bench -- "aoc_{{AOC_YEAR}} day_{{DAY}} "
     fi
     # Run benches/src/main.rs to generate README.md based on benchmark results
-    cargo run benches
+    cargo run --bin advent-benches
 
 
 # Run tests for the year or a specific day, optionally targeting a specific part

@@ -8,11 +8,15 @@
 !**/*.rs
 # Allow Cargo.toml
 !**/Cargo.toml
-!**/Cargo.lock
+!Cargo.lock
 # Ignore target directory
 target/
 # Allow Justfile
 !justfile
-!**/*input.txt
+!**/data/*input.txt
+!**/data/aoc.md
 !rust.tmpl
 !readme.tmpl
+
+
+!.github/workflows/*
