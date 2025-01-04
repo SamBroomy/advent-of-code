@@ -1,6 +1,12 @@
-pub mod direction;
-pub mod grid;
-pub mod point;
+mod helpers;
+pub mod prelude {
+    pub use crate::helpers::{
+        direction::Direction,
+        grid::Grid,
+        point::{Point, PointConversion},
+    };
+}
+
 #[macro_export]
 macro_rules! aoc_run {
     () => {
