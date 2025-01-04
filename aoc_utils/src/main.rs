@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::env;
 
-mod day;
+mod challenge_day;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -15,7 +15,8 @@ struct Args {
 enum Commands {
     /// Fetch puzzle input and description
     Fetch(FetchArgs),
-    Next(NextArgs),
+    Next(YearArgs),
+    Refresh(YearArgs),
 }
 
 #[derive(Parser, Debug)]
@@ -29,7 +30,7 @@ pub(crate) struct FetchArgs {
 }
 
 #[derive(Parser, Debug)]
-pub(crate) struct NextArgs {
+pub(crate) struct YearArgs {
     // Next day so need year
     #[arg(short, long, default_value_t = 0)]
     year: u32,
@@ -43,11 +44,15 @@ fn main() -> Result<()> {
         Commands::Fetch(fetch_args) => {
             let year = pick_year(fetch_args.year)?;
 
-            day::create_day(fetch_args.day, year)?;
+            challenge_day::create_day(fetch_args.day, year)?;
         }
         Commands::Next(next_args) => {
             let year = pick_year(next_args.year)?;
-            day::get_next_day(year)?;
+            challenge_day::get_next_day(year)?;
+        }
+        Commands::Refresh(refresh_args) => {
+            let year = pick_year(refresh_args.year)?;
+            challenge_day::refresh_inputs(year)?;
         }
     }
 

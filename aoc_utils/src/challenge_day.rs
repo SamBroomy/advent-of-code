@@ -42,7 +42,7 @@ impl Day {
             "Successfully created day {} for year {}",
             self.day, self.year
         );
-        println!("Don't forget to check the `data/test-input.txt` file for the correct test input and update the macro with the correct test input");
+        println!("Don't forget to double check the `data/test-input.txt` file for the correct test input and update the macro with the correct test input");
         Ok(())
     }
 
@@ -75,15 +75,27 @@ impl Day {
 
         let page_url = format!("https://adventofcode.com/{}/day/{}", self.year, self.day);
         let page_data = self.fetch_data(&page_url)?;
-        let test_input = self.extract_test_input(&page_data)?;
-        fs::write(self.data_path.join("test-input.txt"), test_input)?;
 
+        let parsed_markdown = self.parsed_page_to_markdown(&page_data)?;
+        fs::write(self.data_path.join("aoc.md"), &parsed_markdown)?;
+
+        let test_input = self.extract_test_input(&parsed_markdown)?;
+        let path = self.data_path.join("test-input.txt");
+        if !path.exists() {
+            fs::write(path, &test_input)?;
+        } else {
+            println!("Test input file already exists. Not overwriting!");
+        }
         Ok(())
     }
 
     fn copy_template(&self) -> Result<()> {
         let mod_file = self.day_path.join("mod.rs");
-        fs::copy(&self.template_path, &mod_file).context("Failed copying template")?;
+        if mod_file.exists() {
+            println!("File already exists for day {}. Not overwriting!", self.day);
+        } else {
+            fs::copy(&self.template_path, &mod_file).context("Failed copying template")?;
+        }
         Ok(())
     }
 
@@ -96,6 +108,11 @@ impl Day {
             let mut updated = content;
             updated.push_str(&mod_line);
             fs::write(&lib_path, updated).context("Failed to update lib.rs")?;
+        } else {
+            println!(
+                "lib.rs already contains mod line for day {}. Not updating!",
+                self.day
+            );
         }
         Ok(())
     }
@@ -121,13 +138,16 @@ impl Day {
         }
     }
 
-    fn extract_test_input(&self, page_data: &str) -> Result<String> {
+    fn parsed_page_to_markdown(&self, page_data: &str) -> Result<String> {
         let re = regex::Regex::new(r"<main>(?s).*</main>")?;
         let main = re.find(page_data).unwrap().as_str();
-        let parsed_markdown = html2md::parse_html(main);
+        Ok(html2md::parse_html(main).trim().into())
+    }
+
+    fn extract_test_input(&self, parsed_markdown: &str) -> Result<String> {
         let re = Regex::new(r"```\n([\s\S]*?)\n```")?;
         let mut blocks: Vec<&str> = re
-            .captures_iter(&parsed_markdown)
+            .captures_iter(parsed_markdown)
             .filter_map(|cap| cap.get(1))
             .map(|m| m.as_str())
             .collect();
@@ -162,4 +182,25 @@ pub fn get_next_day(year: u32) -> Result<()> {
     println!("Highest existing day: {}", current_day);
     println!("Creating day {}", current_day + 1);
     create_day(current_day + 1, year)
+}
+
+pub fn refresh_inputs(year: u32) -> Result<()> {
+    let current_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR")?).canonicalize()?;
+    let days = fs::read_dir(current_dir.join(format!("../aoc_{}", year)).join("src"))?
+        .filter_map(|entry| {
+            entry.ok().and_then(|e| {
+                e.file_name()
+                    .into_string()
+                    .ok()
+                    .and_then(|s| s.strip_prefix("day_").and_then(|d| d.parse().ok()))
+            })
+        })
+        .collect::<Vec<u32>>();
+
+    for day in days {
+        println!("Refreshing day {}", day);
+        let day_instance = Day::new(day, year)?;
+        day_instance.fetch_and_save_input_files()?;
+    }
+    Ok(())
 }
