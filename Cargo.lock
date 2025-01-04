@@ -621,6 +621,7 @@ dependencies = [
  "anyhow",
  "num",
  "num-traits",
+ "thiserror 2.0.9",
 ]
 
 [[package]]
