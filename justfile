@@ -19,12 +19,12 @@ bench DAY="":
     #!/usr/bin/env sh
     if [ "{{DAY}}" = "" ]; then
         cargo bench -- aoc_{{AOC_YEAR}}
+        # Run benches/src/main.rs to generate README.md based on benchmark results
+        cargo run --bin advent-benches
     else
         # The extra space after day{{DAY}} is needed to avoid `just bench 1` matching with 11, 12...
         cargo bench -- "aoc_{{AOC_YEAR}} day_{{DAY}} "
     fi
-    # Run benches/src/main.rs to generate README.md based on benchmark results
-    cargo run --bin advent-benches
 
 
 # Run tests for the year or a specific day, optionally targeting a specific part

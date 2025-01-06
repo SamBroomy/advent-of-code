@@ -1,12 +1,13 @@
+use ahash::AHashMap as HashMap;
+
 fn parse(input: &str) -> (Vec<i32>, Vec<i32>) {
     input
         .lines()
-        .filter_map(|line| {
-            let line = line.split_whitespace().collect::<Vec<&str>>();
-
-            let first = line.first()?.parse::<i32>().ok()?;
-            let second = line.last()?.parse::<i32>().ok()?;
-            Some((first, second))
+        .filter_map(|line| line.split_once("   "))
+        .filter_map(|(left, right)| {
+            let left = left.parse::<i32>().ok();
+            let right = right.parse::<i32>().ok();
+            left.zip(right)
         })
         .unzip()
 }
@@ -14,8 +15,8 @@ fn parse(input: &str) -> (Vec<i32>, Vec<i32>) {
 #[inline]
 pub fn part1(input: &str) -> i32 {
     let (mut left, mut right) = parse(input);
-    left.sort();
-    right.sort();
+    left.sort_unstable();
+    right.sort_unstable();
 
     left.into_iter()
         .zip(right)
@@ -26,8 +27,12 @@ pub fn part1(input: &str) -> i32 {
 pub fn part2(input: &str) -> i32 {
     let (left, right) = parse(input);
 
+    let mut counts = HashMap::with_capacity(right.len());
+    right
+        .iter()
+        .for_each(|r| *counts.entry(*r).or_insert(0) += 1);
     left.iter()
-        .map(|l| l * right.iter().filter(|r| l == *r).count() as i32)
+        .map(|l| l * counts.get(l).copied().unwrap_or(0))
         .sum()
 }
 
