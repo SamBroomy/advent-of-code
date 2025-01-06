@@ -21,14 +21,16 @@ pub fn part2(input: &str) -> i32 {
     let mut total = 0;
 
     for cap in re.captures_iter(input) {
-        if &cap[0] == "do()" {
-            capture = true;
-        } else if &cap[0] == "don't()" {
-            capture = false;
-        } else if capture {
-            let a = cap[1].parse::<i32>().unwrap();
-            let b = cap[2].parse::<i32>().unwrap();
-            total += a * b;
+        match cap[0].as_bytes() {
+            b"don't()" => capture = false,
+            b"do()" => capture = true,
+            _ => {
+                if capture {
+                    let a = cap[1].parse::<i32>().unwrap();
+                    let b = cap[2].parse::<i32>().unwrap();
+                    total += a * b;
+                }
+            }
         }
     }
     total
