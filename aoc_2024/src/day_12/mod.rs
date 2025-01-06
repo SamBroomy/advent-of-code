@@ -1,21 +1,19 @@
-use common::prelude::PointConversion;
-use std::collections::{HashSet, VecDeque};
-
-type Grid = common::prelude::Grid<char>;
-type Point = common::prelude::Point<usize>;
+use ahash::AHashSet as HashSet;
+use common::prelude::{CharGrid, DiagonalDirections, DirectionBehaviour, Grid, GridPoint, Point};
+use std::collections::VecDeque;
 
 fn calculate_perimeter_and_area<const DISCOUNT_ENABLED: bool>(
-    grid: &Grid,
-    seen_points: &mut HashSet<Point>,
-    start: Point,
+    grid: &CharGrid,
+    seen_points: &mut HashSet<GridPoint>,
+    start: GridPoint,
     colour: char,
-) -> Point {
+) -> GridPoint {
     if seen_points.contains(&start) {
         return Point::zero();
     }
 
     let mut perimeter = 0;
-    let mut perimeter_points: HashSet<common::prelude::Point<i32>> = HashSet::new();
+    let mut perimeter_points: HashSet<GridPoint> = HashSet::new();
     let area_before = seen_points.len();
     seen_points.insert(start);
 
@@ -23,22 +21,25 @@ fn calculate_perimeter_and_area<const DISCOUNT_ENABLED: bool>(
     q.push_back(start);
     while let Some(point) = q.pop_front() {
         let mut same_colour_adjacents = 0;
-        let adjacents = grid.adjacent_points::<usize, false>(&point);
-        for p in adjacents {
-            if let Ok(val) = grid.get(p) {
-                if val == colour {
-                    same_colour_adjacents += 1;
-                    if !seen_points.contains(&p) {
-                        q.push_back(p);
-                        seen_points.insert(p);
+
+        point
+            .bounded_cardinals(&(grid.rows, grid.cols).into())
+            .into_iter()
+            .flatten()
+            .for_each(|p| {
+                if let Ok(val) = grid.get_ref(p) {
+                    if val == &colour {
+                        same_colour_adjacents += 1;
+                        if !seen_points.contains(&p) {
+                            q.push_back(p);
+                            seen_points.insert(p);
+                        }
                     }
                 }
-            }
-        }
+            });
+
         perimeter += 4 - same_colour_adjacents;
-        if let Ok(p) = point.try_convert() {
-            perimeter_points.insert(p);
-        }
+        perimeter_points.insert(point);
     }
     let area_after = seen_points.len();
     let perimeter = if DISCOUNT_ENABLED {
@@ -49,76 +50,85 @@ fn calculate_perimeter_and_area<const DISCOUNT_ENABLED: bool>(
     Point::new(perimeter, area_after - area_before)
 }
 
-fn perimeter_corners(
-    points: HashSet<common::prelude::Point<i32>>,
-    rows: usize,
-    columns: usize,
-) -> usize {
+fn perimeter_corners(points: HashSet<GridPoint>, rows: usize, columns: usize) -> usize {
+    let check_diagonal_corner = |point: &GridPoint, dir: DiagonalDirections| {
+        dir.next_point(point)
+            .map(|p| !points.contains(&p))
+            .unwrap_or(false) as usize
+    };
+    let count_all_corners = |point: &GridPoint| {
+        DiagonalDirections::ALL
+            .iter()
+            .map(|dir| check_diagonal_corner(point, *dir))
+            .sum::<usize>()
+    };
+    let count_two_corners = |point: &GridPoint, dirs: &[DiagonalDirections; 2]| {
+        dirs.iter()
+            .map(|dir| check_diagonal_corner(point, *dir))
+            .sum::<usize>()
+    };
+
     points
         .iter()
         .map(|point| {
-            let up = (point.x > 0)
-                .then(|| points.contains(&(point.add_x(-1))))
-                .unwrap_or(false);
-            let right = (point.y + 1 < columns as i32)
-                .then(|| points.contains(&(point.add_y(1))))
-                .unwrap_or(false);
-            let down = (point.x + 1 < rows as i32)
-                .then(|| points.contains(&(point.add_x(1))))
-                .unwrap_or(false);
-            let left = (point.y > 0)
-                .then(|| points.contains(&(point.add_y(-1))))
-                .unwrap_or(false);
+            let is_point_contained =
+                point
+                    .bounded_cardinals(&(rows, columns).into())
+                    .map(|p| match p {
+                        Some(p) => points.contains(&p),
+                        _ => false,
+                    });
 
-            match [up, right, down, left] {
-                [true, true, true, true] => {
-                    !points.contains(&(point.x + 1, point.y + 1).into()) as usize
-                        + !points.contains(&(point.x - 1, point.y - 1).into()) as usize
-                        + !points.contains(&(point.x + 1, point.y - 1).into()) as usize
-                        + !points.contains(&(point.x - 1, point.y + 1).into()) as usize
-                }
-                [true, true, true, false] => {
-                    !points.contains(&(point.x + 1, point.y + 1).into()) as usize
-                        + !points.contains(&(point.x - 1, point.y + 1).into()) as usize
-                }
-                [true, true, false, true] => {
-                    !points.contains(&(point.x - 1, point.y - 1).into()) as usize
-                        + !points.contains(&(point.x - 1, point.y + 1).into()) as usize
-                }
-                [true, false, true, true] => {
-                    !points.contains(&(point.x + 1, point.y - 1).into()) as usize
-                        + !points.contains(&(point.x - 1, point.y - 1).into()) as usize
-                }
-                [false, true, true, true] => {
-                    !points.contains(&(point.x + 1, point.y - 1).into()) as usize
-                        + !points.contains(&(point.x + 1, point.y + 1).into()) as usize
-                }
+            match is_point_contained {
+                // All cardinals present - check all diagonals
+                [true, true, true, true] => count_all_corners(point),
+
+                // Three cardinals present - check two diagonals
+                [true, true, true, false] => count_two_corners(
+                    point,
+                    &[DiagonalDirections::SouthEast, DiagonalDirections::NorthEast],
+                ),
+                [true, true, false, true] => count_two_corners(
+                    point,
+                    &[DiagonalDirections::NorthWest, DiagonalDirections::NorthEast],
+                ),
+                [true, false, true, true] => count_two_corners(
+                    point,
+                    &[DiagonalDirections::SouthWest, DiagonalDirections::NorthWest],
+                ),
+                [false, true, true, true] => count_two_corners(
+                    point,
+                    &[DiagonalDirections::SouthWest, DiagonalDirections::SouthEast],
+                ),
+
+                // Two cardinals present - check one diagonal
                 [true, true, false, false] => {
-                    1 + !points.contains(&(point.x - 1, point.y + 1).into()) as usize
+                    1 + check_diagonal_corner(point, DiagonalDirections::NorthEast)
                 }
-                [true, false, true, false] => 0,
                 [true, false, false, true] => {
-                    1 + !points.contains(&(point.x - 1, point.y - 1).into()) as usize
+                    1 + check_diagonal_corner(point, DiagonalDirections::NorthWest)
                 }
                 [false, true, true, false] => {
-                    1 + !points.contains(&(point.x + 1, point.y + 1).into()) as usize
+                    1 + check_diagonal_corner(point, DiagonalDirections::SouthEast)
                 }
-                [false, true, false, true] => 0,
                 [false, false, true, true] => {
-                    1 + !points.contains(&(point.x + 1, point.y - 1).into()) as usize
+                    1 + check_diagonal_corner(point, DiagonalDirections::SouthWest)
                 }
-                [true, false, false, false] => 2,
-                [false, true, false, false] => 2,
-                [false, false, true, false] => 2,
-                [false, false, false, true] => 2,
+
+                // Special cases
+                [true, false, true, false] | [false, true, false, true] => 0,
+                [true, false, false, false]
+                | [false, true, false, false]
+                | [false, false, true, false]
+                | [false, false, false, true] => 2,
                 [false, false, false, false] => 4,
             }
         })
         .sum()
 }
 
-fn parse(input: &str) -> Grid {
-    Grid::construct(input, |c| c)
+fn parse(input: &str) -> CharGrid {
+    Grid::build_raw_input(input).unwrap()
 }
 
 #[inline]
