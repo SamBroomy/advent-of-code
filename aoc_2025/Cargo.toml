@@ -1,0 +1,10 @@
+[package]
+name = "aoc_2025"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+common = { path = "../common" }
+anyhow = { workspace = true }
+regex = { workspace = true }
+rayon = { workspace = true }
