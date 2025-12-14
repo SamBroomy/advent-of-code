@@ -187,7 +187,10 @@ impl<T> Grid<T> {
 
 // Generic access methods
 impl<T> Grid<T> {
-    ///
+    pub fn iter(&self) -> impl Iterator<Item = &T> + '_ {
+        self.data.iter()
+    }
+
     /// Generic coordinate validation
     fn validate_point<P>(&self, point: Point<P>) -> Result<GridPoint>
     where
@@ -300,13 +303,12 @@ impl<T> Grid<T>
 where
     T: Copy,
 {
-    pub fn iter(&self) -> impl Iterator<Item = (Point<usize>, T)> + '_ {
+    pub fn iter_points(&self) -> impl Iterator<Item = (Point<usize>, T)> + '_ {
         self.data
             .iter()
             .enumerate()
             .map(|(idx, c)| (self.idx_to_point(idx), *c))
     }
-
     pub fn get<P>(&self, point: Point<P>) -> Result<T>
     where
         P: Copy + ToPrimitive + Display,

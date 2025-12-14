@@ -5,9 +5,10 @@ edition = "2021"
 
 [dependencies]
 common = { path = "../common" }
-anyhow.workspace = true
-regex.workspace = true
+anyhow = { workspace = true }
+regex = { workspace = true }
+rayon = { workspace = true }
+
 ahash = "0.8"
-rayon = "1.10"
-tree-ds = { version = "0.1.6", features = ["print_node_id"] }
 winnow = "0.6"
+tree-ds = { version = "0.1.6", features = ["print_node_id"] }

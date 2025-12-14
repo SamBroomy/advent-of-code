@@ -136,7 +136,7 @@ pub fn part1(input: &str) -> i32 {
     let grid = parse(input);
     let mut seen_points = HashSet::with_capacity(grid.size());
 
-    grid.iter()
+    grid.iter_points()
         .map(|(start, colour)| {
             calculate_perimeter_and_area::<false>(&grid, &mut seen_points, start, colour)
         })
@@ -149,7 +149,7 @@ pub fn part2(_input: &str) -> i32 {
     let grid = parse(_input);
     let mut seen_points = HashSet::with_capacity(grid.size());
 
-    grid.iter()
+    grid.iter_points()
         .map(|(start, colour)| {
             calculate_perimeter_and_area::<true>(&grid, &mut seen_points, start, colour)
         })

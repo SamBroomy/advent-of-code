@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = { workspace = true }
+rayon = { workspace = true }
 num-traits = "0.2"
 num-iter = "0.1"
 thiserror = "2.0"
