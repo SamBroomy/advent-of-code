@@ -75,8 +75,12 @@ pub fn part2(input: &str) -> u64 {
         })
         .collect::<Vec<_>>();
     // because the last line (reversed) may not have the appropriate whitespace after it
-    // but the operator line does so we can use that length to determine the distance
-    op_vec.first_mut().unwrap().2 = op_str.len();
+    // so we just need to set it to the longest line length
+    op_vec.first_mut().expect("Not an empty iter").2 = num_str
+        .iter()
+        .map(|s| s.len())
+        .max()
+        .expect("Not an empty iter"); //op_str.len();
 
     let mut problem_total = 0u64;
     for (c, idx, distance) in op_vec.into_iter().rev() {
