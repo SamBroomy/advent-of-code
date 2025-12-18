@@ -9,3 +9,4 @@ itertools = { workspace = true }
 anyhow = { workspace = true }
 regex = { workspace = true }
 rayon = { workspace = true }
+kdtree = "0.8.0"
