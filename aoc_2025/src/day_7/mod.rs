@@ -77,8 +77,6 @@ pub fn part2(input: &str) -> u64 {
             }
         }
     }
-    dbg!(&timelines_map);
-
     timelines_map.iter().sum::<usize>() as u64
 }
 

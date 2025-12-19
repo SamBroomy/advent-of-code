@@ -1,3 +1,4 @@
+#![warn(clippy::dbg_macro, clippy::print_stdout, clippy::print_stderr)]
 pub mod day_1;
 pub mod day_10;
 pub mod day_11;

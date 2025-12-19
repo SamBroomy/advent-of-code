@@ -7,8 +7,24 @@ anyhow = "1.0"
 regex = "1.11.1"
 rayon = "1.10"
 itertools = "0.14.0"
-# phf = { version = "0.11", features = ["macros"] }
-# winnow = "0.6.21"
+num-traits = "0.2"
+num-iter = "0.1"
+thiserror = "2.0"
+paste = "1.0"
+serde = "1.0"
+serde_json = "1.0.134"
+glob = "0.3.1"
+scan_fmt = "0.2.6"
+csv = "1.3"
+reqwest = { version = "0.12", features = ["blocking"] }
+rookie = "0.5"
+jiff = "0.2.16"
+html2md = "0.2"
+clap = { version = "4", features = ["derive"] }
+
+common = { path = "common" }
+aoc_2024 = { path = "aoc_2024" }
+aoc_2025 = { path = "aoc_2025" }
 
 [profile.bench]
 lto = true

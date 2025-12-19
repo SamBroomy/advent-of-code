@@ -185,11 +185,6 @@ pub fn part2(input: &str) -> u64 {
         if uf.union(*id, *nearest_idx) {
             components -= 1;
             if components == 1 {
-                println!("Connected all components");
-                println!(
-                    "Last edge: {:?} <-> {:?}",
-                    points[*id], points[*nearest_idx]
-                );
                 return points[*id].1.x as u64 * points[*nearest_idx].1.x as u64;
             }
         }

@@ -8,9 +8,10 @@ fn parse(input: &str) -> impl ParallelIterator<Item = Vec<i8>> + '_ {
 }
 
 fn is_valid_sequence(line: &[i8]) -> bool {
-    let mut windows = line.windows(2);
-    (windows.all(|w| w[0] < w[1]) || windows.all(|w| w[0] > w[1]))
-        && windows.all(|w| (w[0] - w[1]).abs() <= 3)
+    let inc = line.windows(2).all(|w| w[0] < w[1]);
+    let dec = line.windows(2).all(|w| w[0] > w[1]);
+    let dif_ok = line.windows(2).all(|w| (w[0] - w[1]).abs() <= 3);
+    (inc || dec) && dif_ok
 }
 
 fn is_valid_line_2(line: &[i8]) -> bool {
@@ -19,11 +20,12 @@ fn is_valid_line_2(line: &[i8]) -> bool {
     }
     (0..line.len()).any(|i| {
         let seq: Vec<_> = line[..i].iter().chain(line[i + 1..].iter()).collect();
-        let mut w = seq.windows(2);
-        w.all(|w| w[0] < w[1]) || w.all(|w| w[0] > w[1]) && w.all(|w| (w[0] - w[1]).abs() <= 3)
+        let inc = seq.windows(2).all(|w| w[0] < w[1]);
+        let dec = seq.windows(2).all(|w| w[0] > w[1]);
+        let dif_ok = seq.windows(2).all(|w| (w[0] - w[1]).abs() <= 3);
+        (inc || dec) && dif_ok
     })
 }
-
 #[inline]
 pub fn part1(input: &str) -> usize {
     parse(input).filter(|line| is_valid_sequence(line)).count()

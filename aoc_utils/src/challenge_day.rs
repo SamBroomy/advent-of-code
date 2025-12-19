@@ -4,6 +4,8 @@ use reqwest::blocking::Client;
 use rookie::{common::enums::CookieToString, firefox};
 use std::{fs, path::PathBuf};
 
+// TODO: extract the test input answer from the page. It should be the last code block of the given article?
+
 /// Represents a particular Advent of Code day
 #[derive(Debug)]
 struct Day {
@@ -42,7 +44,7 @@ impl Day {
             "Successfully created day {} for year {}",
             self.day, self.year
         );
-        println!("Don't forget to double check the `data/test-input.txt` file for the correct test input and update the macro with the correct test input");
+        println!("Don't forget to double check the `data/sample-input.txt` file for the correct sample input and update the macro with the correct sample answer!");
         Ok(())
     }
 
@@ -80,7 +82,7 @@ impl Day {
         fs::write(self.data_path.join("aoc.md"), &parsed_markdown)?;
 
         let test_input = self.extract_test_input(&parsed_markdown)?;
-        let path = self.data_path.join("test-input.txt");
+        let path = self.data_path.join("sample-input.txt");
         if !path.exists() {
             fs::write(path, &test_input)?;
         } else {
@@ -139,12 +141,14 @@ impl Day {
     }
 
     fn parsed_page_to_markdown(&self, page_data: &str) -> Result<String> {
+        // TODO: parse <article ...> ... </article> for both part one and two
         let re = regex::Regex::new(r"<main>(?s).*</main>")?;
         let main = re.find(page_data).unwrap().as_str();
         Ok(html2md::parse_html(main).trim().into())
     }
 
     fn extract_test_input(&self, parsed_markdown: &str) -> Result<String> {
+        // TODO: improve, find the code block that is under "For example"
         let re = Regex::new(r"```\n([\s\S]*?)\n```")?;
         let mut blocks: Vec<&str> = re
             .captures_iter(parsed_markdown)

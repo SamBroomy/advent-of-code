@@ -13,7 +13,8 @@
 target/
 # Allow Justfile
 !justfile
-!**/data/*input.txt
+# !**/data/*input.txt
+!**/data/sample-input*.txt
 !**/data/aoc.md
 !rust.tmpl
 !readme.tmpl

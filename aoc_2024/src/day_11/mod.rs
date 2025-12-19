@@ -26,7 +26,7 @@ fn digits(num: u128) -> u128 {
 fn second_rule(i: u128) -> Option<(u128, u128)> {
     // If the stone is engraved with a number that has an even number of digits, it is replaced by two stones. The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
     let num_digits = digits(i);
-    if num_digits % 2 == 0 {
+    if num_digits.is_multiple_of(2) {
         let half = num_digits / 2;
         let left = i / 10_u128.pow(half as u32);
         let right = i % 10_u128.pow(half as u32);

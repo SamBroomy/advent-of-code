@@ -31,7 +31,7 @@ bench DAY="":
 test DAY="" TARGET="":
     #!/usr/bin/env sh
     if [ "{{DAY}}" = "" ]; then
-        cargo test --manifest-path aoc_{{AOC_YEAR}}/Cargo.toml
+        cargo test -r --manifest-path aoc_{{AOC_YEAR}}/Cargo.toml
     else
-        cargo test --manifest-path aoc_{{AOC_YEAR}}/Cargo.toml -- day_{{DAY}}::tests::part_{{TARGET}} --nocapture
+        cargo test -r --manifest-path aoc_{{AOC_YEAR}}/Cargo.toml -- day_{{DAY}}::tests::part_{{TARGET}} --nocapture
     fi

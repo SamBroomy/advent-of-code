@@ -47,26 +47,6 @@ impl Line {
         assert!(start.x == end.x || start.y == end.y);
         Self { start, end }
     }
-
-    fn points(&self) -> Box<dyn Iterator<Item = Point>> {
-        if self.start.x == self.end.x {
-            let x = self.start.x;
-            let (y_start, y_end) = if self.start.y <= self.end.y {
-                (self.start.y, self.end.y)
-            } else {
-                (self.end.y, self.start.y)
-            };
-            Box::new((y_start..=y_end).map(move |y| Point { x, y }))
-        } else {
-            let y = self.start.y;
-            let (x_start, x_end) = if self.start.x <= self.end.x {
-                (self.start.x, self.end.x)
-            } else {
-                (self.end.x, self.start.x)
-            };
-            Box::new((x_start..=x_end).map(move |x| Point { x, y }))
-        }
-    }
 }
 
 struct Shape {
@@ -301,7 +281,6 @@ pub fn part2(input: &str) -> u64 {
             largest_area = area;
         }
     }
-    println!("Largest area found: {}", largest_area);
     largest_area
 }
 

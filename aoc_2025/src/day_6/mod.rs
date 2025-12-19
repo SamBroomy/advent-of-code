@@ -84,7 +84,6 @@ pub fn part2(input: &str) -> u64 {
 
     let mut problem_total = 0u64;
     for (c, idx, distance) in op_vec.into_iter().rev() {
-        // dbg!(c, idx, distance);
         let mut nums = vec![];
         for i in (0..distance - idx).rev() {
             let mut num = 0;
