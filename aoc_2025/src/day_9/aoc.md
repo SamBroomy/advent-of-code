@@ -1,10 +1,9 @@
-\--- Day 9: Movie Theater ---
-----------
+# [Day 9 — Advent of Code 2025](https://adventofcode.com/2025/day/9)
 
-You slide down the [firepole](https://en.wikipedia.org/wiki/Fireman%27s_pole) in the corner of the playground and land in the North Pole base movie theater!
+## --- Day 9: Movie Theater ---
 
+You slide down the [firepole](https://en.wikipedia.org/wiki/Fireman's_pole) in the corner of the playground and land in the North Pole base movie theater!
 The movie theater has a big tile floor with an interesting pattern. Elves here are redecorating the theater by switching out some of the square tiles in the big grid they form. Some of the tiles are *red*; the Elves would like to find the largest rectangle that uses red tiles for two of its opposite corners. They even have a list of where the red tiles are located in the grid (your puzzle input).
-
 For example:
 
 ```
@@ -16,7 +15,6 @@ For example:
 2,5
 2,3
 7,3
-
 ```
 
 Showing red tiles as `#` and other tiles as `.`, the above arrangement of red tiles would look like this:
@@ -31,11 +29,9 @@ Showing red tiles as `#` and other tiles as `.`, the above arrangement of red ti
 ..............
 .........#.#..
 ..............
-
 ```
 
 You can choose any two red tiles as the opposite corners of your rectangle; your goal is to find the largest rectangle possible.
-
 For example, you could make a rectangle (shown as `O`) with an area of `24` between `2,5` and `9,7`:
 
 ```
@@ -44,26 +40,24 @@ For example, you could make a rectangle (shown as `O`) with an area of `24` betw
 ..............
 ..#....#......
 ..............
+..*O*OOOOOOO....
 ..OOOOOOOO....
-..OOOOOOOO....
-..OOOOOOOO.#..
+..OOOOOOO*O*.#..
 ..............
-
 ```
 
 Or, you could make a rectangle with area `35` between `7,1` and `11,7`:
 
 ```
 ..............
-.......OOOOO..
-.......OOOOO..
-..#....OOOOO..
+.......*O*OOOO..
 .......OOOOO..
 ..#....OOOOO..
 .......OOOOO..
+..#....OOOOO..
 .......OOOOO..
+.......OOOO*O*..
 ..............
-
 ```
 
 You could even make a thin rectangle with an area of only `6` between `7,3` and `2,3`:
@@ -72,46 +66,37 @@ You could even make a thin rectangle with an area of only `6` between `7,3` and 
 ..............
 .......#...#..
 ..............
-..OOOOOO......
+..*O*OOOO*O*......
 ..............
 ..#......#....
 ..............
 .........#.#..
 ..............
-
 ```
 
 Ultimately, the largest rectangle you can make in this example has area `*50*`. One way to do this is between `2,5` and `11,1`:
 
 ```
 ..............
+..OOOOOOOOO*O*..
 ..OOOOOOOOOO..
 ..OOOOOOOOOO..
 ..OOOOOOOOOO..
-..OOOOOOOOOO..
-..OOOOOOOOOO..
+..*O*OOOOOOOOO..
 ..............
 .........#.#..
 ..............
-
 ```
 
 Using two red tiles as opposite corners, *what is the largest area of any rectangle you can make?*
 
-To begin, [get your puzzle input](9/input).
+## --- Part Two ---
 
-Answer:
+The Elves just remembered: they can only switch out tiles that are *red* or *green*. So, your rectangle can only include red or green tiles.
+In your list, every red tile is connected to the red tile before and after it by a straight line of *green tiles*. The list wraps, so the first red tile is also connected to the last red tile. Tiles that are adjacent in your list will always be on either the same row or the same column.
+Using the same example as before, the tiles marked `X` would be green:
 
-You can also [Shareon [Bluesky](https://bsky.app/intent/compose?text=%22Movie+Theater%22+%2D+Day+9+%2D+Advent+of+Code+2025+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2025%2Fday%2F9) [Twitter](https://twitter.com/intent/tweet?text=%22Movie+Theater%22+%2D+Day+9+%2D+Advent+of+Code+2025&url=https%3A%2F%2Fadventofcode%2Ecom%2F2025%2Fday%2F9&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
-
---- Part Two ---
-
-The Elves just remembered: they can only switch out tiles that are red or green. So, your rectangle can only include red or green tiles.
-
-In your list, every red tile is connected to the red tile before and after it by a straight line of green tiles. The list wraps, so the first red tile is also connected to the last red tile. Tiles that are adjacent in your list will always be on either the same row or the same column.
-
-Using the same example as before, the tiles marked X would be green:
-
+```
 ..............
 .......#XXX#..
 .......X...X..
@@ -121,9 +106,11 @@ Using the same example as before, the tiles marked X would be green:
 .........X.X..
 .........#X#..
 ..............
+```
 
-In addition, all of the tiles inside this loop of red and green tiles are also green. So, in this example, these are the green tiles:
+In addition, all of the tiles *inside* this loop of red and green tiles are *also* green. So, in this example, these are the green tiles:
 
+```
 ..............
 .......#XXX#..
 .......XXXXX..
@@ -133,45 +120,50 @@ In addition, all of the tiles inside this loop of red and green tiles are also g
 .........XXX..
 .........#X#..
 ..............
+```
 
 The remaining tiles are never red nor green.
-
 The rectangle you choose still must have red tiles in opposite corners, but any other tiles it includes must now be red or green. This significantly limits your options.
+For example, you could make a rectangle out of red and green tiles with an area of `15` between `7,3` and `11,1`:
 
-For example, you could make a rectangle out of red and green tiles with an area of 15 between 7,3 and 11,1:
-
+```
 ..............
+.......OOOO*O*..
 .......OOOOO..
-.......OOOOO..
-..#XXXXOOOOO..
+..#XXXX*O*OOOO..
 ..XXXXXXXXXX..
 ..#XXXXXX#XX..
 .........XXX..
 .........#X#..
 ..............
+```
 
-Or, you could make a thin rectangle with an area of 3 between 9,7 and 9,5:
+Or, you could make a thin rectangle with an area of `3` between `9,7` and `9,5`:
 
+```
 ..............
 .......#XXX#..
 .......XXXXX..
 ..#XXXX#XXXX..
 ..XXXXXXXXXX..
-..#XXXXXXOXX..
+..#XXXXXX*O*XX..
 .........OXX..
-.........OX#..
+.........*O*X#..
 ..............
+```
 
-The largest rectangle you can make in this example using only red and green tiles has area 24. One way to do this is between 9,5 and 2,3:
+The largest rectangle you can make in this example using only red and green tiles has area `*24*`. One way to do this is between `9,5` and `2,3`:
 
+```
 ..............
 .......#XXX#..
 .......XXXXX..
+..*O*OOOOOOOXX..
 ..OOOOOOOOXX..
-..OOOOOOOOXX..
-..OOOOOOOOXX..
+..OOOOOOO*O*XX..
 .........XXX..
 .........#X#..
 ..............
+```
 
-Using two red tiles as opposite corners, what is the largest area of any rectangle you can make using only red and green tiles?
+Using two red tiles as opposite corners, *what is the largest area of any rectangle you can make using only red and green tiles?*

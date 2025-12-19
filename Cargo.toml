@@ -22,7 +22,7 @@ jiff = "0.2.16"
 fast_html2md = "0.0.55"
 html2md = "0.2"
 clap = { version = "4", features = ["derive"] }
-
+html-escape = "0.2"
 common = { path = "common" }
 aoc_2024 = { path = "aoc_2024" }
 aoc_2025 = { path = "aoc_2025" }

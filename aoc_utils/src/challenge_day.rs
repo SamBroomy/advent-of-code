@@ -89,12 +89,8 @@ impl Day {
         let md_path = self.day_path.join("aoc.md");
         let page_url = format!("https://adventofcode.com/{}/day/{}", self.year, self.day);
 
-        let mut fetch = false;
-        if sample_path.exists() && !force {
-            println!("Test input file already exists. Not overwriting!");
-        } else {
-            fetch = true;
-        }
+        let mut fetch = !sample_path.exists() || force;
+
         if md_path.exists() {
             let existing = fs::read_to_string(&md_path)
                 .with_context(|| format!("failed to read existing {:?}", md_path))?;
@@ -199,11 +195,24 @@ impl Day {
     }
 
     fn parsed_page_to_markdown(&self, main_html: &str) -> Result<String> {
-        // Prefer the <main> section if present.
         let article_re = Regex::new(r"(?s)<article\b[^>]*>.*?</article>").expect("valid regex");
+        // remove <code> inside <pre> so html2md only emits a single ``` block
+        let pre_code_re =
+            Regex::new(r"(?is)(<pre\b[^>]*>)\s*<code\b[^>]*>(?P<body>.*?)</code>\s*(</pre>)")
+                .expect("valid regex");
         let articles: Vec<String> = article_re
             .find_iter(main_html)
-            .map(|m| html2md::rewrite_html(m.as_str(), true))
+            .map(|m| {
+                let html = m.as_str().to_string();
+
+                let cleaned = pre_code_re
+                    .replace_all(&html, |caps: &regex::Captures| {
+                        let body = html_escape::decode_html_entities(&caps["body"]);
+                        format!("{}{}{}", &caps[1], body, &caps[3])
+                    })
+                    .into_owned();
+                html2md::rewrite_html(&cleaned, true)
+            })
             .collect();
         if articles.is_empty() {
             return Err(anyhow!("No <article> blocks found in page HTML"));
