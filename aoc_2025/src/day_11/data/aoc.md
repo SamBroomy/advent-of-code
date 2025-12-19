@@ -49,7 +49,6 @@ Answer:
 
 You can also [Shareon [Bluesky](https://bsky.app/intent/compose?text=%22Reactor%22+%2D+Day+11+%2D+Advent+of+Code+2025+%23AdventOfCode+https%3A%2F%2Fadventofcode%2Ecom%2F2025%2Fday%2F11) [Twitter](https://twitter.com/intent/tweet?text=%22Reactor%22+%2D+Day+11+%2D+Advent+of+Code+2025&url=https%3A%2F%2Fadventofcode%2Ecom%2F2025%2Fday%2F11&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
 
-The first half of this puzzle is complete! It provides one gold star: *
 --- Part Two ---
 
 Thanks in part to your analysis, the Elves have figured out a little bit about the issue. They now know that the problematic data path passes through both dac (a digital-to-analog converter) and fft (a device which performs a fast Fourier transform).
