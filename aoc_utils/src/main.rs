@@ -16,7 +16,7 @@ enum Commands {
     /// Fetch puzzle input and description
     Fetch(FetchArgs),
     Next(YearArgs),
-    Refresh(YearArgs),
+    Refresh(RefreshArgs),
 }
 
 #[derive(Parser, Debug)]
@@ -36,6 +36,17 @@ pub(crate) struct YearArgs {
     year: u32,
 }
 
+#[derive(Parser, Debug)]
+pub(crate) struct RefreshArgs {
+    /// Challenge year
+    #[arg(short, long, default_value_t = 0)]
+    year: u32,
+
+    /// Force refresh of all inputs, even if they exist
+    #[arg(short, long, default_value_t = false)]
+    force: bool,
+}
+
 fn main() -> Result<()> {
     let args = Args::parse();
 
@@ -52,7 +63,8 @@ fn main() -> Result<()> {
         }
         Commands::Refresh(refresh_args) => {
             let year = pick_year(refresh_args.year)?;
-            challenge_day::refresh_inputs(year)?;
+
+            challenge_day::refresh_inputs(year, refresh_args.force)?;
         }
     }
 

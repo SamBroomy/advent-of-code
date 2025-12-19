@@ -31,7 +31,7 @@ pub fn write_to_readme(data: &BTreeMap<(u32, u32), Record>) -> anyhow::Result<()
     }
 
     let readme = README_TEMPLATE.replace("{{table}}", &output);
-    std::fs::write("readme.md", readme)?;
+    std::fs::write("README.md", readme)?;
 
     Ok(())
 }

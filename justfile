@@ -6,13 +6,13 @@ default:
     @just --list
 
 new DAY:
-    @cargo run --bin aoc_utils fetch --day {{DAY}} --year {{AOC_YEAR}}
+    @cargo run -r --bin aoc_utils fetch --day {{DAY}} --year {{AOC_YEAR}}
 
 next:
-    @cargo run --bin aoc_utils next --year {{AOC_YEAR}}
+    @cargo run -r --bin aoc_utils next --year {{AOC_YEAR}}
 
-refresh:
-    cargo run --bin aoc_utils refresh --year {{AOC_YEAR}}
+refresh YEAR=AOC_YEAR:
+    cargo run -r --bin aoc_utils refresh --year {{YEAR}}
 
 # Run benchmarks for the year or a specific day
 bench DAY="":

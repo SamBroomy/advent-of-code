@@ -11,4 +11,4 @@ clap = { workspace = true }
 reqwest = { workspace = true }
 rookie = { workspace = true }
 jiff = { workspace = true }
-html2md = { workspace = true }
+fast_html2md = { workspace = true }

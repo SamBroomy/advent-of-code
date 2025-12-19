@@ -21,3 +21,4 @@ target/
 
 
 !.github/workflows/*
+!README.md

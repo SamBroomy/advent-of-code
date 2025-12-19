@@ -9,7 +9,7 @@ fn main() -> anyhow::Result<()> {
     let records = read::read_all_data(&csv_path)?;
     dbg!(&records);
     write::write_to_readme(&records)?;
-    println!("Wrote readme.md");
+    println!("Wrote README.md");
     write::write_to_csv(&csv_path, &records)?;
     println!("Wrote benches.csv");
 
