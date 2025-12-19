@@ -2,10 +2,12 @@ use core::fmt;
 use std::{
     collections::HashMap,
     ops::{Deref, DerefMut},
+    sync::RwLock,
 };
 
 use itertools::Itertools;
-
+use rayon::iter::ParallelIterator;
+use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
 struct Light(u16);
 
@@ -217,7 +219,7 @@ pub fn part1(input: &str) -> u32 {
     let puzzles = parse(input);
 
     puzzles
-        .iter()
+        .par_iter()
         .map(|(lights, buttons, _)| fewest_buttons(lights, buttons) as u32)
         .sum()
 }
@@ -240,10 +242,10 @@ fn valid_combination(light: &Light, buttons: &Buttons) -> Vec<Buttons> {
 fn search(
     joltage: Joltage,
     buttons: &Buttons,
-    cache: &mut HashMap<(Joltage, Buttons), u32>,
+    cache: &RwLock<HashMap<(Joltage, Buttons), u32>>,
 ) -> u32 {
     let cache_key = (joltage, buttons.clone());
-    if let Some(&cached) = cache.get(&cache_key) {
+    if let Some(&cached) = cache.read().unwrap().get(&cache_key) {
         return cached;
     }
     let lights = Light::from_joltage(&cache_key.0);
@@ -251,7 +253,9 @@ fn search(
     let button_combinations = valid_combination(&lights, buttons);
 
     if button_combinations.is_empty() {
-        cache.insert(cache_key, u32::MAX);
+        {
+            cache.write().unwrap().insert(cache_key, u32::MAX);
+        }
         return u32::MAX;
     }
 
@@ -274,7 +278,9 @@ fn search(
         })
         .min()
         .unwrap();
-    cache.insert(cache_key, min_button_presses);
+    {
+        cache.write().unwrap().insert(cache_key, min_button_presses);
+    }
     min_button_presses
 }
 
@@ -284,10 +290,10 @@ pub fn part2(input: &str) -> u64 {
 
     let puzzles = parse(input).into_iter().collect::<Vec<_>>();
 
-    let mut cache = HashMap::new();
+    let cache = RwLock::new(HashMap::new());
     puzzles
-        .iter()
-        .map(|(_, buttons, joltage)| search(joltage.clone(), buttons, &mut cache) as u64)
+        .into_par_iter()
+        .map(|(_, buttons, joltage)| search(joltage, &buttons, &cache) as u64)
         .sum()
 }
 

@@ -1,6 +1,7 @@
 use itertools::Itertools;
-use std::{cell::RefCell, collections::HashMap};
-
+use rayon::iter::ParallelBridge;
+use rayon::iter::ParallelIterator;
+use std::{collections::HashMap, sync::RwLock};
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
 struct Point {
     x: u64,
@@ -57,7 +58,7 @@ struct Shape {
     max_y: u64,
     // For each y in [min_y..=max_y] a vec of inclusive x-ranges that are inside the shape.
     spans: Vec<Vec<(u64, u64)>>,
-    cache: RefCell<HashMap<Point, bool>>,
+    cache: RwLock<HashMap<Point, bool>>,
 }
 
 impl Shape {
@@ -130,7 +131,7 @@ impl Shape {
             min_y,
             max_y,
             spans,
-            cache: RefCell::new(HashMap::new()),
+            cache: RwLock::new(HashMap::new()),
         }
     }
     fn point_on_edge(&self, point: &Point) -> bool {
@@ -156,8 +157,8 @@ impl Shape {
         false
     }
     fn is_inside(&self, point: &Point) -> bool {
-        if let Some(cached) = self.cache.borrow().get(point) {
-            return *cached;
+        if let Some(cached) = self.cache.read().unwrap().get(point).copied() {
+            return cached;
         }
 
         if point.x < self.min_x
@@ -165,7 +166,9 @@ impl Shape {
             || point.y < self.min_y
             || point.y > self.max_y
         {
-            self.cache.borrow_mut().insert(*point, false);
+            {
+                self.cache.write().unwrap().insert(*point, false);
+            }
             return false;
         }
         let row = (point.y - self.min_y) as usize;
@@ -174,12 +177,16 @@ impl Shape {
             .iter()
             .any(|&(s, e)| point.x >= s && point.x <= e)
         {
-            self.cache.borrow_mut().insert(*point, true);
+            {
+                self.cache.write().unwrap().insert(*point, true);
+            }
             return true;
         }
         // If not in a span, it might still be exactly on an edge
         let out = self.point_on_edge(point);
-        self.cache.borrow_mut().insert(*point, out);
+        {
+            self.cache.write().unwrap().insert(*point, out);
+        }
         out
     }
 
@@ -270,18 +277,24 @@ pub fn part2(input: &str) -> u64 {
     // Bounding boxes of our grid.
     let shape = Shape::new(&red_points);
 
-    let mut largest_area = 0;
-    for (i, j) in red_points.iter().tuple_combinations() {
-        let rectangle = Rectangle {
-            point_1: *i,
-            point_2: *j,
-        };
-        let area = rectangle.area();
-        if area > largest_area && shape.is_rectangle_inside(&rectangle) {
-            largest_area = area;
-        }
-    }
-    largest_area
+    red_points
+        .into_iter()
+        .tuple_combinations()
+        .par_bridge()
+        .map(|(i, j)| {
+            let rectangle = Rectangle {
+                point_1: i,
+                point_2: j,
+            };
+            let area = rectangle.area();
+            if shape.is_rectangle_inside(&rectangle) {
+                area
+            } else {
+                0
+            }
+        })
+        .max()
+        .unwrap()
 }
 
 common::aoc_test!(50, 4763509452, 24, 1516897893);

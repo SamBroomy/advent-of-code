@@ -69,7 +69,7 @@ fn markdown_for_year(data: &BTreeMap<(u32, u32), Record>, required_year: u32) ->
 }
 
 fn get_problem_name(year: u32, day: u32) -> Option<String> {
-    let path = format!("aoc_{year}/src/day_{day}/data/aoc.md");
+    let path = format!("aoc_{year}/src/day_{day}/aoc.md");
     let content = std::fs::read_to_string(path).unwrap();
     let re = regex::Regex::new(r"-- Day [0-9]+: (.*) --").unwrap();
     let problem_name = re.captures(&content)?.get(1)?.as_str().to_string();
