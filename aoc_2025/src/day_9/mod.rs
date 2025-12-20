@@ -1,6 +1,9 @@
 use itertools::Itertools;
 use rayon::iter::ParallelBridge;
 use rayon::iter::ParallelIterator;
+use std::sync::Arc;
+use std::sync::atomic::AtomicU64;
+use std::sync::atomic::Ordering;
 use std::{collections::HashMap, sync::RwLock};
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
 struct Point {
@@ -276,18 +279,38 @@ pub fn part2(input: &str) -> u64 {
     let red_points = parse(input);
     // Bounding boxes of our grid.
     let shape = Shape::new(&red_points);
+    // shared best-area used to prune work across threads
+    let best = Arc::new(AtomicU64::new(0));
 
     red_points
         .into_iter()
         .tuple_combinations()
         .par_bridge()
-        .map(|(i, j)| {
+        .map_with(best, |best_ref, (i, j)| {
             let rectangle = Rectangle {
                 point_1: i,
                 point_2: j,
             };
             let area = rectangle.area();
+
+            // cheap prune: if area can't beat current best, skip expensive check
+            if area <= best_ref.load(Ordering::Relaxed) {
+                return 0;
+            }
             if shape.is_rectangle_inside(&rectangle) {
+                // try to update global best (loop to handle races)
+                let mut prev = best_ref.load(Ordering::Relaxed);
+                while area > prev {
+                    match best_ref.compare_exchange_weak(
+                        prev,
+                        area,
+                        Ordering::Relaxed,
+                        Ordering::Relaxed,
+                    ) {
+                        Ok(_) => break,
+                        Err(next) => prev = next,
+                    }
+                }
                 area
             } else {
                 0
